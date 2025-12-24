@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dolphin CRM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="dolphin_crm.css">
+    </head>
+    <body>
+        <header class="header_section">
+            <img src = "Dolphin-Emoji-PNG.jpg" alt="Dolphin emoji" class="header_logo"/>
+            <h1 class="header_title">Dolphin CRM</h1>
+        </header>
+
+        <main>
+            <section id="overview">
+                <h1>Login</h1>
+                <div class="login-container">
+                <form action="/login" method="post">
+                    <div id = "username">
+                    <input type="text" id="username" name="username" required placeholder="Email Address">
+                    </div>
+
+                    <div id = "password">
+                    <input type="password" id="password" name="password" required placeholder="Password">
+                    </div>
+
+                    <div id = "login-button">
+                    <button type="submit">Login</button>
+                    </div>
+                </div>
+                </form>
+            </section>
+
+            <div id = "results">
+
+            </div>
+        </main>
+    </body>
+    <hr>
+    <footer>
+        <p>&copy; Copyright © 2022 Dolphin CRM</p>
+    </footer>
+</html> 
