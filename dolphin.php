@@ -1,16 +1,44 @@
 <?php
 session_start();
 
-    $username = 'admin@project2.com';
-    $password = $_POST['password123'];
-    $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
+$host = 'localhost';
+$db   = 'dolphin_crm';
+$user = 'root';
+$pass = '';
 
-    if 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
 
-if ($_POST['username'] == "admin@project2.com" && $_POST['password'] == "password123") {
-    header("Location : main.html");
-    exit();
-} else {
-    echo "invalid username or password";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    /*
+    $password = $_POST['password'];
+    $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
+
+    if (!preg_match($passwordRegex, $password)) {
+        echo "Password does not meet complexity requirements.";
+        exit();
+    }
+    */
+
+    //Proceed to database verification
+    $email = $_POST['username'];
+    $password = $_POST['password'];
+
+    //Query the database for the user
+    $stmt = $pdo->prepare("SELECT * FROM Users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    //Verify the password
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
+        echo "success";
+    } else {
+        echo "invalid username or password";
+    }
 }
 ?>
