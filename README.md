@@ -2,3 +2,4 @@
 
 This is the final project for:
 Jordan Graham (620172528)
+Sean Thompson (620170129)
