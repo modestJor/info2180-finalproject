@@ -34,13 +34,20 @@ function setupNewUserForm() {
     }
 }
 
-function loadDashboard() {
-    fetch("dashboard.php")
+function loadUsers() {
+    fetch("users.php")
+    .then(response => response.text())
+    .then(html => {
+        document.querySelector('main').innerHTML = html;
+    });
+}
+
+function loadDashboard(filter = 'all') {
+    fetch(`dashboard.php?filter=${filter}`)
     .then(response => response.text())
     .then(html => {
         document.querySelector('main').innerHTML = html; // Load dashboard content into main section
-    })
-    .catch(error => console.error("Error loading dashboard:", error));
+    });
 }
 
 function loadNewUser() {
@@ -61,6 +68,49 @@ function loadContactDetails(contactId) {
         setupAddNoteForm(); // Initialize note submission listener
     })
     .catch(error => console.error("Error loading contact details:", error));
+}
+
+function loadNewContact() {
+    fetch("new_contact.php")
+    .then(response => response.text())
+    .then(html => {
+        document.querySelector('main').innerHTML = html;
+        setupNewContactForm();
+    });
+}
+
+function setupNewContactForm() {
+    const form = document.getElementById('new-contact-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            fetch('add_contact.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.ok) {
+                    loadDashboard();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding contact. Check console for details.');
+            });
+        });
+    }
+}
+
+function logout() {
+    fetch('logout.php')
+    .then(() => {
+        window.location.href = 'dolphin_crm.html';
+    });
 }
 
 function setupAddNoteForm() {
@@ -90,6 +140,20 @@ function setupAddNoteForm() {
             });
         });
     }
+}
+
+
+
+function handleAction(contactId, actionType) {
+    const formData = new FormData();
+    formData.append('id', contactId);
+    formData.append('action', actionType);
+
+    fetch('update_contact.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(() => loadContactDetails(contactId)); // Refresh details view via AJAX
 }
 
 document.getElementById("login-form").addEventListener("submit", function(e) {

@@ -55,6 +55,20 @@ $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
 function e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 ?>
 
+<div class="contact-header">
+    <div class="contact-title-box">
+        <h2><?= e($contact['title'] . ' ' . $contact['firstname'] . ' ' . $contact['lastname']) ?></h2>
+        <p class="muted">Created on <?= e($contact['created_at']) ?> by <?= e($contact['created_by_name']) ?></p>
+        <p class="muted">Updated on <?= e($contact['updated_at']) ?></p>
+    </div>
+    <div class="contact-actions">
+        <button onclick="handleAction(<?= $contact['id'] ?>, 'assign')">Assign to me</button>
+        <button onclick="handleAction(<?= $contact['id'] ?>, 'switch')">
+            Switch to <?= $contact['type'] === 'Sales Lead' ? 'Support' : 'Sales Lead' ?>
+        </button>
+    </div>
+</div>
+
 <div class="contact-details">
     <h2><?= e($contact['title'] . '. ' . $contact['firstname'] . ' ' . $contact['lastname']) ?></h2>
 

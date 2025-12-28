@@ -6,18 +6,29 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$host = 'localhost';
-$db   = 'dolphin_crm';
-$user = 'root';
-$pass = '';
+require 'db_connect.php';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+$filter = $_GET['filter'] ?? 'all';
+$userId = $_SESSION['user_id'];
+
+
+$query = "SELECT id, title, firstname, lastname, email, telephone, company, type FROM Contacts";
+
+if ($filter === 'sales') {
+    $query .= " WHERE type = 'Sales Lead'";
+} elseif ($filter === 'support') {
+    $query .= " WHERE type = 'Support'";
+} elseif ($filter === 'assigned') {
+    $query .= " WHERE assigned_to = :userId";
 }
 
-$stmt = $pdo->prepare("SELECT id, title, firstname, lastname, email, company, type, created_at, updated_at FROM Contacts ORDER BY updated_at DESC");
+
+
+$stmt = $pdo->prepare($query);
+if ($filter === 'assigned') {
+    $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+}
+
 $stmt->execute();
 $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -26,42 +37,40 @@ function e($v) {
 }
 ?>
 
-<div class="dashboard">
+
+<div class="dashboard-controls">
     <h2>Dashboard</h2>
-
-    <h3>Contacts</h3>
-
-    <table class="contacts-table" width="100%" cellspacing="0" cellpadding="8">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Company</th>
-                <th>Type</th>
-                <th>Updated</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <?php if (count($contacts) === 0): ?>
-                <tr>
-                    <td colspan="6">No contacts found.</td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($contacts as $contact): ?>
-                    <tr>
-                        <td><?= e($contact['title'] . '. ' . $contact['firstname'] . ' ' . $contact['lastname']) ?></td>
-                        <td><?= e($contact['email']) ?></td>
-                        <td><?= e($contact['company']) ?></td>
-                        <td><?= e($contact['type']) ?></td>
-                        <td><?= e($contact['updated_at']) ?></td>
-                        <td>
-                            <button onclick="loadContactDetails(<?= (int)$contact['id'] ?>)">View</button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+    <div>
+        <?php if ($_SESSION['role'] === 'Admin'): ?>
+        <button class="btn-users" onclick="loadUsers()">View Users</button>
+        <?php endif; ?>
+        <button class="btn-add" onclick="loadNewContact()">+ Add Contact</button>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
 </div>
+
+<div class="filter-container">
+    <p>Filter By:</p>
+    <button onclick="loadDashboard('all')">All</button>
+    <button onclick="loadDashboard('sales')">Sales Leads</button>
+    <button onclick="loadDashboard('support')">Support</button>
+    <button onclick="loadDashboard('assigned')">Assigned to me</button>
+</div>
+
+<table class="contacts-table">
+    <thead>
+        <tr><th>Name</th><th>Email</th><th>Telephone</th><th>Company</th><th>Type</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        <?php foreach ($contacts as $contact): ?>
+        <tr>
+            <td><strong><?= e($contact['title'] . ' ' . $contact['firstname'] . ' ' . $contact['lastname']) ?></strong></td>
+            <td><?= e($contact['email']) ?></td>
+            <td><?= e($contact['telephone']) ?></td> 
+            <td><?= e($contact['company']) ?></td>
+            <td class="type-pill <?= strtolower(str_replace(' ', '-', $contact['type'])) ?>"><?= e($contact['type']) ?></td>
+            <td><a href="#" onclick="loadContactDetails(<?= $contact['id'] ?>)">View</a></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

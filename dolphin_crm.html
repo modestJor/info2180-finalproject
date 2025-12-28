@@ -7,32 +7,54 @@
         <link rel="stylesheet" href="dolphin_styles.css">
     </head>
     <body>
-        <header class="header_section">
-            <img src="Dolphin-Emoji-PNG.jpg" alt="Dolphin emoji" class="header_logo"/>
-            <h1 class="header_title">Dolphin CRM</h1>
-        </header>
+        <div id="app-container">
+            
+            <header class="header_section">
+                <img src="Dolphin-Emoji-PNG.jpg" alt="Dolphin emoji" class="header_logo"/>
+                <h1 class="header_title">Dolphin CRM</h1>
+            </header>
 
-        <main>
-            <section id="overview">
-                <h1>Login</h1>
-                <div class="login-container">
-                    <form id="login-form">
-                        <input type="text" id="username" name="username" required placeholder="Email Address">
-                        <input type="password" id="password" name="password" required placeholder="Password">
-                        <button type="submit" id="login-btn">Login</button>
-                    </form>
-                </div>
-                <div id="main-content">
-                    
-                </div>
-            </section>
+            <div class="main-container">
+                
+                <nav id="sidebar" class="sidebar" style="display: none;">
+                    <div class="sidebar-user">
+                        <div class="user-avatar"><?php echo substr($_SESSION['firstname'] ?? 'U', 0, 1); ?></div>
+                        <div class="user-info">
+                            <div class="user-name"><?php echo ($_SESSION['firstname'] ?? 'User') . ' ' . ($_SESSION['lastname'] ?? ''); ?></div>
+                            <div class="user-role"><?php echo $_SESSION['role'] ?? 'Member'; ?></div>
+                        </div>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li><a href="#" onclick="loadDashboard()" class="active"><span class="icon">📊</span> Dashboard</a></li>
+                        <li><a href="#" onclick="loadNewContact()"><span class="icon">➕</span> New Contact</a></li>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                        <li><a href="#" onclick="loadUsers()"><span class="icon">👥</span> Users</a></li>
+                        <li><a href="#" onclick="loadNewUser()"><span class="icon">👤</span> Add User</a></li>
+                        <?php endif; ?>
+                        <li><a href="#" onclick="logout()"><span class="icon">🚪</span> Logout</a></li>
+                    </ul>
+                </nav>
 
-            <script src="app.js"></script>
-        </main>
-        
-        <hr>
-        <footer>
-            <p>&copy; Copyright © 2022 Dolphin CRM</p>
-        </footer>
+                
+                <main id="main-content">
+                    <section id="overview">
+                        <h1>Login</h1>
+                        <div class="login-container">
+                            <form id="login-form">
+                                <input type="text" id="username" name="username" required placeholder="Email Address">
+                                <input type="password" id="password" name="password" required placeholder="Password">
+                                <button type="submit" id="login-btn">Login</button>
+                            </form>
+                        </div>
+                    </section>
+                </main>
+            </div>
+            
+            <footer>
+                <p>&copy; Copyright 2022 Dolphin CRM</p>
+            </footer>
+        </div>
+
+        <script src="app.js"></script>
     </body>
 </html>
