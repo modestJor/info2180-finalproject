@@ -34,11 +34,11 @@ function setupNewUserForm() {
     }
 }
 
-function loadDashboard() {
-    fetch("dashboard.php")
+function loadDashboard(filter = 'all') {
+    fetch(`dashboard.php?filter=${filter}`)
     .then(response => response.text())
     .then(html => {
-        document.querySelector('main').innerHTML = html; // Load dashboard content into main section
+        document.querySelector('main').innerHTML = html;
     })
     .catch(error => console.error("Error loading dashboard:", error));
 }
@@ -93,26 +93,72 @@ function setupAddNoteForm() {
 }
 
 function loadUsers() {
-  fetch("users.php")
+    fetch("users.php")
     .then(r => r.text())
     .then(html => {
-      document.querySelector("main").innerHTML = html;
+        document.querySelector("main").innerHTML = html;
     })
     .catch(err => console.error("Error loading users:", err));
 }
 
+function loadNewContact() {
+    fetch("new_contact.php")
+    .then(response => response.text())
+    .then(html => {
+        document.querySelector('main').innerHTML = html;
+        setupNewContactForm();
+    })
+    .catch(error => console.error("Error loading new contact form:", error));
+}
+
+function setupNewContactForm() {
+    const form = document.getElementById('new-contact-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            fetch('add_contact.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.ok) {
+                    loadDashboard();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding contact. Check console for details.');
+            });
+        });
+    }
+}
+
+function logout() {
+    fetch('logout.php')
+    .then(() => {
+        window.location.href = 'dolphin_crm.html';
+    });
+}
+
+function handleAction(contactId, actionType) {
+    const formData = new FormData();
+    formData.append('id', contactId);
+    formData.append('action', actionType);
+
+    fetch('update_contact.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(() => loadContactDetails(contactId)); // Refresh details view
+}
 
 document.getElementById("login-form").addEventListener("submit", function(e) {
     e.preventDefault();
-    /*
-    const password = document.getElementById("password").value;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-        alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.");
-        return;
-    }
-    */
 
     const formData = new FormData(document.getElementById("login-form"));
     fetch("dolphin.php", {
@@ -122,8 +168,9 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
     .then(response => response.text())
     .then(data => {
         if (data.trim() === "success") {
+            // Hide login section
+            document.getElementById("overview").style.display = "none";
             loadDashboard();
-
         } else {
             alert("Login failed. Please check your credentials.");
         }

@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // IMPORTANT: table is "users" in the schema :contentReference[oaicite:1]{index=1}
-    $stmt = $pdo->prepare("SELECT id, firstname, lastname, email, password, role FROM users WHERE email = ?");
+    // FIXED: Changed "users" to "Users" to match schema
+    $stmt = $pdo->prepare("SELECT id, firstname, lastname, email, password, role FROM Users WHERE email = ?");
     $stmt->execute([$email]);
     $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id']   = $userRow['id'];
         $_SESSION['role']      = $userRow['role'];        // Admin or Member
         $_SESSION['firstname'] = $userRow['firstname'];
+        $_SESSION['lastname']  = $userRow['lastname'];
 
         echo "success";
         exit;

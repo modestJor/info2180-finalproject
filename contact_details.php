@@ -56,6 +56,13 @@ function e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 ?>
 
 <div class="contact-details">
+    <div class="contact-actions">
+        <button onclick="handleAction(<?= $contact['id'] ?>, 'assign')">Assign to me</button>
+        <button onclick="handleAction(<?= $contact['id'] ?>, 'switch')">
+            Switch to <?= $contact['type'] === 'Sales Lead' ? 'Support' : 'Sales Lead' ?>
+        </button>
+    </div>
+
     <h2><?= e($contact['title'] . '. ' . $contact['firstname'] . ' ' . $contact['lastname']) ?></h2>
 
     <div class="contact-meta">
