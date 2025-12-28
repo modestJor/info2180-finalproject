@@ -92,6 +92,16 @@ function setupAddNoteForm() {
     }
 }
 
+function loadUsers() {
+  fetch("users.php")
+    .then(r => r.text())
+    .then(html => {
+      document.querySelector("main").innerHTML = html;
+    })
+    .catch(err => console.error("Error loading users:", err));
+}
+
+
 document.getElementById("login-form").addEventListener("submit", function(e) {
     e.preventDefault();
     /*
